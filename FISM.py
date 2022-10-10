@@ -200,7 +200,7 @@ def training_loss(model, sess, batches):
     return train_loss / num_batch
 
 if __name__=='__main__':
-
+    tf.compat.v1.disable_eager_execution()
     args = parse_args()
     regs = eval(args.regs)
 
