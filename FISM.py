@@ -75,10 +75,10 @@ class FISM:
 
     def _create_placeholders(self):
         with tf.name_scope("input_data"):
-            self.user_input = tf.compat.v1.placeholder(tf.int32, shape=[None, None])	#the index of users
-            self.num_idx = tf.compat.v1.placeholder(tf.float32, shape=[None, 1])	#the number of items rated by users
-            self.item_input = tf.compat.v1.placeholder(tf.int32, shape=[None, 1])	  #the index of items
-            self.labels = tf.compat.v1.placeholder(tf.float32, shape=[None,1])	#the ground truth
+            self.user_input = tf.placeholder(tf.int32, shape=[None, None])	#the index of users
+            self.num_idx = tf.placeholder(tf.float32, shape=[None, 1])	#the number of items rated by users
+            self.item_input = tf.placeholder(tf.int32, shape=[None, 1])	  #the index of items
+            self.labels = tf.placeholder(tf.float32, shape=[None,1])	#the ground truth
 
     def _create_variables(self):
         with tf.name_scope("embedding"):  # The embedding initialization is unknown now
