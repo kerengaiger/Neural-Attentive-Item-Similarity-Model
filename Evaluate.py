@@ -11,6 +11,7 @@ import heapq # for retrieval topK
 import multiprocessing
 import numpy as np
 from time import time
+import pickle
 #from numba import jit, autojit
 
 # Global variables that are shared across processes
@@ -55,7 +56,7 @@ def eval(model, sess, testRatings, testNegatives, DictList):
     _K = 10
 
     num_thread = 1#multiprocessing.cpu_count()
-    hits, ndcgs, losses = [],[],[]
+    hits, ndcgs, losses, rrs, positions = [],[],[],[],[]
     if(num_thread > 1): # Multi-thread
         pool = multiprocessing.Pool(num_thread)
         res = pool.map(_eval_one_rating, range(len(_testRatings)))
@@ -64,13 +65,21 @@ def eval(model, sess, testRatings, testNegatives, DictList):
         hits = [r[0] for r in res]
         ndcgs = [r[1] for r in res]
         losses = [r[2] for r in res]
+        rrs = [r[3] for r in res]
+        positions = [r[4] for r in res]
     # Single thread
     else:
         for idx in xrange(len(_testRatings)):
-            (hr,ndcg, loss) = _eval_one_rating(idx)
+            (hr, ndcg, loss, rr, position) = _eval_one_rating(idx)
             hits.append(hr)
-            ndcgs.append(ndcg)  
-            losses.append(loss)    
+            ndcgs.append(ndcg)
+            losses.append(loss)
+            rrs.append(rr)
+            positions.append(positions)
+    pickle.dump(hits, open('hits.pkl','wb'))
+    pickle.dump(ndcgs, open('ndcgs.pkl','wb'))
+    pickle.dump(rrs, open('rrs.pkl','wb'))
+    pickle.dump(positions, open('positions.pkl','wb'))
     return (hits, ndcgs, losses)
 
 def load_test_as_list():
@@ -112,6 +121,6 @@ def _eval_one_rating(idx):
     # calculate HR@10, NDCG@10, AUC
     hr = position < _K
     ndcg = math.log(2) / math.log(position+2) if hr else 0
+    rr = 1 / position
 
-    return (hr, ndcg, loss)
-
+    return (hr, ndcg, loss, rr, position)
